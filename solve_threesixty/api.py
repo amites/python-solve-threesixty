@@ -14,6 +14,8 @@ except ImportError:
         SOLVE360_USER = "user@email.address"
         SOLVE360_PASS = "API-KEY"
         SOLVE360_SERVER = "secure.solve360.com"
+        SOLVE360_OWNERID = "id for default owner of new items"
+        DEBUG = False
 
 try:
     from general.utils_dict import clearEmpties
@@ -137,3 +139,19 @@ class Solve360:
         payload = self.connect('GET', '/ownership/')
         self.close()
         return payload
+
+    def report(self, uri, **kwargs):
+        if uri[0] != '/':
+            uri = '/report/%s' % uri
+        if len(kwargs) > 0:
+            uri += '?'
+            for key in kwargs:
+                uri += '%s=%s&' % (key, kwargs[key])
+            uri = uri[:-1]
+        payload = self.connect('GET', uri)
+        self.close()
+        return payload
+
+    def opportunitiesList(self, **kwargs):
+        return self.report('opportunities', kwargs)
+
