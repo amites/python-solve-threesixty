@@ -8,7 +8,7 @@ except ImportError:
     import json
 
 try:
-  from django.conf import settings
+    from django.conf import settings
 except ImportError:
     import settings
 
@@ -19,9 +19,10 @@ except ImportError:
         """
         Removes empty values from a dict.
         """
-        return dict( [(k,v) for k,v in d.items() if v and len(v)>0])
+        return dict([(k, v) for k, v in d.items() if v and len(v) > 0])
 
 logger = logging.getLogger('solve_threesixty')
+
 
 class Solve360:
     def __init__(self, **kwargs):
@@ -46,7 +47,9 @@ class Solve360:
 
         headers = {
             'Authorization': 'Basic %s' %
-                 base64.encodestring(":".join([self.user, self.password]).encode('utf-8')).replace('\n', ''),
+                 base64.encodestring(":".join(
+                        [self.user, self.password]
+                    ).encode('utf-8')).replace('\n', ''),
         }
 
         headers['Content-Type'] = 'application/%s' % type
@@ -58,8 +61,9 @@ class Solve360:
         self.connection.request(verb, uri, body, headers)
         response = self.connection.getresponse()
         if not response.status in (200, 201):
-            logger.error('Unable to post to Solve360 at %s - %s:%s\nPayload: %s'
-                % (uri, response.status, response.reason, body))
+            logger.error('Unable to post to Solve360 at %s -' \
+                            + '%s:%s\nPayload: %s'
+                            % (uri, response.status, response.reason, body))
         else:
 #            self.connection.close()
             return response.read()
@@ -69,7 +73,7 @@ class Solve360:
         Connects to Solve360 using JSON passing body_dict for arguments.
         """
         payload = self.connect(verb, uri, json.dumps(clearEmpties(body_dict),
-            separators=(',',':')), type='json')
+            separators=(',', ':')), type='json')
         self.close()
         return payload
 
@@ -114,7 +118,8 @@ class Solve360:
 
     def fieldsList(self):
         """
-        Returns a dict of { field_name : field_title } for all fields in account.
+        Returns a dict of { field_name : field_title }
+        for all fields in account.
         """
         payload = self.connect('GET', '/contacts/fields/')
         self.close()
@@ -170,21 +175,25 @@ class Solve360:
         body = {}
         for key in kwargs:
             if key == 'valuecurrency':
-                values = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'BRL', 'CHF', 'CNY',
-                          'DKK', 'HKD', 'HRK', 'HUF', 'INR', 'JPY', 'MXN', 'MYR',
-                          'NOK', 'NZD', 'RUB', 'SEK', 'SGD', 'THB', 'ZAR', ]
+                values = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'BRL', 'CHF',
+                          'CNY', 'DKK', 'HKD', 'HRK', 'HUF', 'INR', 'JPY',
+                          'MXN', 'MYR', 'NOK', 'NZD', 'RUB', 'SEK', 'SGD',
+                          'THB', 'ZAR', ]
                 if kwargs[key] not in values:
-                    raise Exception('Invalid valuecurrency must be one of: %s' % ', '.join(values))
-            elif key =='valueinterval':
+                    raise Exception('Invalid valuecurrency must be one of: %s'\
+                                        % ', '.join(values))
+            elif key == 'valueinterval':
                 values = ['fixed price', 'per hour', 'per day', 'per week',
-                          'per month', 'per quarter', 'per month', 'per quarter',
-                          'per year', ]
+                          'per month', 'per quarter', 'per month',
+                          'per quarter', 'per year', ]
                 if kwargs[key] not in values:
-                    raise Exception('Invalid valueinterval must be one of: %s' % ', '.join(values))
+                    raise Exception('Invalid valueinterval must be one of: %s'\
+                                        % ', '.join(values))
             elif key == 'status':
                 values = ['Discussion', 'Pending', 'Won', 'Lost', 'On-hold', ]
                 if kwargs[key] not in values:
-                    raise Exception('Invalid status must be one of: %s' % ', '.join(values))
+                    raise Exception('Invalid status must be one of: %s'\
+                                        % ', '.join(values))
 
             body[key] = kwargs[key]
         response = self.connectJSON('POST', '/opportunity', body)
