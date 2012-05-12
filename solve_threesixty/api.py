@@ -137,7 +137,6 @@ class Solve360(object):
 
         return json.loads(payload)['fields']
 
-
     def fieldsListDict(self, payload=False):
         """
         Returns a dict of { field_name : field_title }

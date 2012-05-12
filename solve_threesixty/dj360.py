@@ -15,3 +15,9 @@ class Django360(Solve360):
             for row in obj['users']:
                 usr = ThreeSixtyUser()
                 usr.addUser(row, False)
+
+    def getContactFields(self):
+        obj = self.contactFieldsList()
+        for row in obj:
+            field = ThreeSixtyField()
+            field.addField(row)
