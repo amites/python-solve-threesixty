@@ -3,25 +3,25 @@ from solve_threesixty.models import ThreeSixtyContact, ThreeSixtyTag, \
                                     ThreeSixtyField, ThreeSixtyUser
 
 
-class ThreeSixtyContactAdmin(admin.Admin):
+class ThreeSixtyContactAdmin(admin.ModelAdmin):
     actions_on_top = True
 
 
-class ThreeSixtyFieldAdmin(admin.Admin):
-    actions_on_top = True
-    list_display = ('solve_id', 'type', )
-    list_filter = ('type', )
-    radio_fields = ('type')
-
-
-class ThreeSixtyTagAdmin(admin.Admin):
+class ThreeSixtyFieldAdmin(admin.ModelAdmin):
     actions_on_top = True
     list_display = ('solve_id', 'type', )
     list_filter = ('type', )
-    radio_fields = ('type')
+    radio_fields = {'type' : admin.VERTICAL}
 
 
-class ThreeSixtyUserAdmin(admin.Admin):
+class ThreeSixtyTagAdmin(admin.ModelAdmin):
+    actions_on_top = True
+    list_display = ('solve_id', 'type', )
+    list_filter = ('type', )
+    radio_fields = {'type' : admin.VERTICAL}
+
+
+class ThreeSixtyUserAdmin(admin.ModelAdmin):
     actions_on_top = True
 
 

@@ -7,10 +7,19 @@ try:
 except ImportError:
     import json
 
+
+logger = logging.getLogger('solve_threesixty')
+
 try:
     from django.conf import settings
 except ImportError:
     import settings
+
+#try:
+#from solve_threesixty.models import ThreeSixtyUser
+#except ImportError:
+#    logger.log(1, 'Unable to load models.')
+#    print 'WTF?'
 
 try:
     from general.utils_dict import clearEmpties
@@ -21,12 +30,11 @@ except ImportError:
         """
         return dict([(k, v) for k, v in d.items() if v and len(v) > 0])
 
-logger = logging.getLogger('solve_threesixty')
 
-
-class Solve360:
+class Solve360(object):
     def __init__(self, **kwargs):
-        self.server = kwargs.get('server', settings.SOLVE360_SERVER)
+        server = getattr(settings, 'SOLVE360_SERVER', "secure.solve360.com")
+        self.server = kwargs.get('server', server)
         self.user = kwargs.get('user', settings.SOLVE360_USER)
         self.password = kwargs.get('password', settings.SOLVE360_PASS)
         self.owner = kwargs.get('owner', settings.SOLVE360_OWNERID)
@@ -60,13 +68,16 @@ class Solve360:
             self.connection.set_debuglevel(1)
         self.connection.request(verb, uri, body, headers)
         response = self.connection.getresponse()
-        if not response.status in (200, 201):
+        if response.status in (200, 201):
+            return response.read()
+        elif response.status in (401, ):
+            logger.error('Invalid login -- check credentials.')
+        else:
+#            return response
             logger.error('Unable to post to Solve360 at %s -' \
                             + '%s:%s\nPayload: %s'
                             % (uri, response.status, response.reason, body))
-        else:
-#            self.connection.close()
-            return response.read()
+
 
     def connectJSON(self, verb, uri, body_dict):
         """
@@ -116,24 +127,33 @@ class Solve360:
         self.close()
         return payload
 
-    def fieldsList(self):
+    def contactFieldsList(self):
         """
-        Returns a dict of { field_name : field_title }
-        for all fields in account.
+        Returns a  dict of all contact fields response.
         """
         payload = self.connect('GET', '/contacts/fields/')
         self.close()
         fields = {}
-        for j in payload['fields']:
+
+        return json.loads(payload)['fields']
+
+
+    def fieldsListDict(self, payload=False):
+        """
+        Returns a dict of { field_name : field_title }
+            for all fields in account.
+        Defaults to contact fields.
+        """
+        if not payload:
+            payload = self.contactFieldsList()
+        for j in payload:
             try:
-                label = json.loads(j['label'])
+                label = j['label']
                 if isinstance(label, dict):
                     label = label['title']
             except ValueError:
                 label = j['label']
-#            print '%s : %s' % (label, j['name'])
             fields[j['name']] = label
-#        return payload
         return fields
 
     def ownershipList(self):
@@ -142,7 +162,17 @@ class Solve360:
         """
         payload = self.connect('GET', '/ownership/')
         self.close()
-        return payload
+        try:
+            obj = json.loads(payload)
+            if obj['status'] != 'success':
+                logger.error('Bad response for ownershipList: %s' \
+                            % obj['status'])
+            return obj
+
+        except ValueError:
+            logger.error('Invalid response for Solve360.ownershipList: %s' \
+                            % payload)
+            return payload
 
     def report(self, uri, **kwargs):
         """
@@ -198,3 +228,18 @@ class Solve360:
             body[key] = kwargs[key]
         response = self.connectJSON('POST', '/opportunity', body)
         return response
+
+
+class Django360(Solve360):
+    def __init__(self, **kwargs):
+        super(Django360, self).__init__(**kwargs)
+
+    def getUsers(self):
+        obj = self.ownershipList()
+        if obj['status'] == 'success':
+            for row in obj['groups']:
+                grp = ThreeSixtyUser()
+                grp.addUser(row, True)
+            for row in obj['users']:
+                usr = ThreeSixtyUser()
+                usr.addUser(row, False)

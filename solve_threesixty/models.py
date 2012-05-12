@@ -1,4 +1,5 @@
 from django.db import models
+from solve_threesixty.api import Solve360
 
 
 class SolveThreeSixty(models.Model):
@@ -44,4 +45,20 @@ class ThreeSixtyField(SolveThreeSixty):
 
 
 class ThreeSixtyUser(SolveThreeSixty):
-    pass
+    name = models.CharField(max_length=150, help_text='Solve360 User Name',
+                            blank=True, null=True)
+    email = models.CharField(max_length=250,
+                            help_text='Solve360 User Email address',
+                            blank=True, null=True)
+    group = models.BooleanField(help_text='Is this a Solve360 User Group?',
+                            default=False)
+#
+#    def addUser(self, row, group=False):
+##        try:
+##            self =
+#        self.solve_id = row['id']
+#        self.email = row['email']
+#        self.name = row['name']
+#        self.group = group
+#        self.save()
+#        return self
