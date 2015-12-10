@@ -38,22 +38,22 @@ class Solve360:
         Base connector class to Solve360.
         """
         if not verb in ['GET', 'POST', 'PUT', 'DELETE']:
-            logger.error('Invalid verb for Solve360 %s' % verb)
+            logger.error('Invalid verb for Solve360 {0!s}'.format(verb))
             return False
 
         if not type in ['json', 'xml']:
-            logger.error('Invalid data type for Solve360 %s' % verb)
+            logger.error('Invalid data type for Solve360 {0!s}'.format(verb))
             return False
 
         headers = {
-            'Authorization': 'Basic %s' %
+            'Authorization': 'Basic {0!s}'.format(
                  base64.encodestring(":".join(
                         [self.user, self.password]
-                    ).encode('utf-8')).replace('\n', ''),
+                    ).encode('utf-8')).replace('\n', '')),
         }
 
-        headers['Content-Type'] = 'application/%s' % type
-        headers['Accept'] = 'application/%s' % type
+        headers['Content-Type'] = 'application/{0!s}'.format(type)
+        headers['Accept'] = 'application/{0!s}'.format(type)
 
         self.connection = httplib.HTTPSConnection(self.server)
         if settings.DEBUG:
@@ -62,8 +62,7 @@ class Solve360:
         response = self.connection.getresponse()
         if not response.status in (200, 201):
             logger.error('Unable to post to Solve360 at %s -' \
-                            + '%s:%s\nPayload: %s'
-                            % (uri, response.status, response.reason, body))
+                            + '{0!s}:{1!s}\nPayload: {2!s}'.format(uri, response.status, response.reason, body))
         else:
 #            self.connection.close()
             return response.read()
@@ -85,7 +84,7 @@ class Solve360:
         """
         Returns raw response of all fields for contact.
         """
-        payload = self.connect('GET', '/contacts/%s' % contact_id)
+        payload = self.connect('GET', '/contacts/{0!s}'.format(contact_id))
         self.close()
         return payload
 
@@ -104,7 +103,7 @@ class Solve360:
         """
         Deletes a contact by ID.
         """
-        payload = self.connect('DELETE', '/contacts/%s' % contact_id)
+        payload = self.connect('DELETE', '/contacts/{0!s}'.format(contact_id))
         self.close()
         return payload
 
@@ -150,11 +149,11 @@ class Solve360:
         Refer to http://bit.ly/solve360-api-reports
         """
         if uri[0] != '/':
-            uri = '/report/%s' % uri
+            uri = '/report/{0!s}'.format(uri)
         if len(kwargs) > 0:
             uri += '?'
             for key in kwargs:
-                uri += '%s=%s&' % (key, kwargs[key])
+                uri += '{0!s}={1!s}&'.format(key, kwargs[key])
             uri = uri[:-1]
         payload = self.connect('GET', uri)
         self.close()
@@ -180,20 +179,17 @@ class Solve360:
                           'MXN', 'MYR', 'NOK', 'NZD', 'RUB', 'SEK', 'SGD',
                           'THB', 'ZAR', ]
                 if kwargs[key] not in values:
-                    raise Exception('Invalid valuecurrency must be one of: %s'\
-                                        % ', '.join(values))
+                    raise Exception('Invalid valuecurrency must be one of: {0!s}'.format(', '.join(values)))
             elif key == 'valueinterval':
                 values = ['fixed price', 'per hour', 'per day', 'per week',
                           'per month', 'per quarter', 'per month',
                           'per quarter', 'per year', ]
                 if kwargs[key] not in values:
-                    raise Exception('Invalid valueinterval must be one of: %s'\
-                                        % ', '.join(values))
+                    raise Exception('Invalid valueinterval must be one of: {0!s}'.format(', '.join(values)))
             elif key == 'status':
                 values = ['Discussion', 'Pending', 'Won', 'Lost', 'On-hold', ]
                 if kwargs[key] not in values:
-                    raise Exception('Invalid status must be one of: %s'\
-                                        % ', '.join(values))
+                    raise Exception('Invalid status must be one of: {0!s}'.format(', '.join(values)))
 
             body[key] = kwargs[key]
         response = self.connectJSON('POST', '/opportunity', body)
