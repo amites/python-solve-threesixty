@@ -19,7 +19,7 @@ except ImportError:
         """
         Removes empty values from a dict.
         """
-        return dict([(k, v) for k, v in d.items() if v and len(v) > 0])
+        return {k: v for k, v in d.items() if v and len(v) > 0}
 
 logger = logging.getLogger('solve_threesixty')
 
