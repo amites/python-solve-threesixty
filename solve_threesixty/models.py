@@ -1,16 +1,8 @@
+# Pluggable set of Django models for Solve360
+
+from django.conf import settings
 from django.db import models
 
-
-class SolveThreeSixty(models.Model):
-    solve_id = models.CharField(max_length=250, \
-                        help_text='Solve 360 api key.', null=True)
-
-    class Meta:
-        abstract = True
-
-
-class ThreeSixtyContact(SolveThreeSixty):
-    pass
 
 TAG_TYPES = (
     ('blog', 'Blog'),
@@ -19,14 +11,6 @@ TAG_TYPES = (
 )
 
 
-class ThreeSixtyTag(SolveThreeSixty):
-    type = models.CharField(max_length=30, help_text='Type of Tag', \
-                            choices=TAG_TYPES, blank=True, null=True)
-
-    class Meta:
-        unique_together = (('solve_id', 'type'), )
-        ordering = ('type', )
-
 FIELD_TYPES = (
     ('blog', 'Blog'),
     ('company', 'Company'),
@@ -34,8 +18,26 @@ FIELD_TYPES = (
 )
 
 
+class SolveThreeSixty(models.Model):
+    class Meta:
+        abstract = True
+
+
+class ThreeSixtyContact(SolveThreeSixty):
+    pass
+
+
+class ThreeSixtyTag(SolveThreeSixty):
+    type = models.CharField(max_length=30, help_text='Type of Tag',
+                            choices=TAG_TYPES, blank=True, null=True)
+
+    class Meta:
+        unique_together = (('solve_id', 'type'), )
+        ordering = ('type', )
+
+
 class ThreeSixtyField(SolveThreeSixty):
-    type = models.CharField(max_length=30, help_text='Type of Field', \
+    type = models.CharField(max_length=30, help_text='Type of Field',
                             choices=FIELD_TYPES, blank=True, null=True)
 
     class Meta:

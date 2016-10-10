@@ -1,6 +1,7 @@
+# Automatically register the included models into the Django admin.
 from django.contrib import admin
-from solve_threesixty.models import ThreeSixtyContact, ThreeSixtyTag, \
-                                    ThreeSixtyField, ThreeSixtyUser
+from solve_threesixty.models import (ThreeSixtyContact, ThreeSixtyField,
+                                     ThreeSixtyTag, ThreeSixtyUser)
 
 
 class ThreeSixtyContactAdmin(admin.Admin):
@@ -11,14 +12,14 @@ class ThreeSixtyFieldAdmin(admin.Admin):
     actions_on_top = True
     list_display = ('solve_id', 'type', )
     list_filter = ('type', )
-    radio_fields = ('type')
+    radio_fields = ('type', )
 
 
 class ThreeSixtyTagAdmin(admin.Admin):
     actions_on_top = True
     list_display = ('solve_id', 'type', )
     list_filter = ('type', )
-    radio_fields = ('type')
+    radio_fields = ('type', )
 
 
 class ThreeSixtyUserAdmin(admin.Admin):

@@ -22,7 +22,7 @@ setup(
     author_email='alvin@mitesdesign.com',
     license='BSD',
     packages=find_packages(),
-    package_data = {
+    package_data={
         'solve_threesixty': [
             '*'
         ],
