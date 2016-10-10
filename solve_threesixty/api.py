@@ -26,7 +26,7 @@ logger = logging.getLogger('solve_threesixty')
 # API Class #
 #############
 
-class Solve360:
+class Solve360(object):
     def __init__(self, **kwargs):
         self.server = kwargs.get('server', settings.SOLVE360_SERVER)
         self.user = kwargs.get('user', settings.SOLVE360_USER)
